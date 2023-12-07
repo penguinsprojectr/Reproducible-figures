@@ -1,0 +1,341 @@
+---
+title: "Homework Template"
+output:
+  html_document: default
+  pdf_document: default
+date: "2023-10-09"
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r setupCRAN, echo=FALSE}
+r = getOption("repos")
+r["CRAN"] = "http://cran.us.r-project.org"
+options(repos = r)
+```
+
+
+
+```{r packageInstall, echo=FALSE} 
+#Installs necessary packages
+#install.packages("tinytex")
+#install.packages("tidyverse")
+#install.packages("ggplot2")
+#install.packages("palmerpenguins")
+#install.packages("janitor")
+#install.packages("dplyr")
+```
+
+```{r load, echo=FALSE, include=FALSE} 
+#Loading tinytex
+library("tinytex")
+library("tidyverse")
+library("ggplot2")
+library("palmerpenguins")
+library("janitor")
+library("dplyr")
+```
+
+
+## QUESTION 01: Data Visualisation for Science Communication
+
+*Create a figure using the Palmer Penguin dataset that is correct but badly communicates the data. **Do not make a boxplot**.*
+
+*Use the following references to guide you:*
+
+-   [*https://www.nature.com/articles/533452a*](https://www.nature.com/articles/533452a){.uri}
+-   [*https://elifesciences.org/articles/16800*](https://elifesciences.org/articles/16800){.uri}
+
+*Note: Focus on visual elements rather than writing misleading text on it.*
+
+### a) Provide your figure here:
+
+```{r bad figure code, echo=FALSE, message=FALSE, warnings=FALSE}
+ggplot(data=na.omit(penguins), aes(x=bill_depth_mm, y=bill_length_mm))+
+  geom_point()+
+  labs(x="Bill depth (mm)", y="Bill length (mm)", title="A graph to show bill length against bill depth in penguins")+
+  geom_smooth(method="lm")+
+  theme_classic()
+```
+
+### b) Write about how your design choices mislead the reader about the underlying data (200-300 words).
+
+The graph and fitted line show a slight negative correlation between bill length and depth. However, this is the trend when analysing the data across all three species in the dataset. When instead the points are coloured by species (see figure 1, below) using the colour attribute within the aes() function, an individual positive trend is quite clearly seen within all three species. Though the above graph is technically correct (the data points are all plotted correctly on the graph with the correct scales, and the line is fitted accurately), the figure is misleading the viewer by omission of information – specifically, that grouping the data into species reveals different trends. This is an example of Simpson’s Paradox, a phenomenon where data shows a distinct correlation when split into relevant groups, but the correlation is removed or reversed with the removal of the group splits(1). Another issue with the figure is that the code is not provided along with it (though we were instructed not to). This means the viewer cannot verify things such as that the figure hasn’t just been fabricated instead of coded according to the dataset, and that there are no issues in the code such as accidental swapping of the axis. It also makes it harder for the viewer to investigate further using the graph, as they can’t change aspects such as colouring by species, which limits studies that build upon the graph. All-in-all, this figure could be made much better by colouring by species (or, more generally, investigating the data better) and by making the code available. 
+
+
+```{r better figure code, echo=FALSE, message=FALSE, warnings=FALSE}
+ggplot(data=na.omit(penguins), aes(x=bill_depth_mm, y=bill_length_mm, colour=species))+
+  geom_point()+
+  labs(x="Bill depth (mm)", y="Bill length (mm)", title="Figure 1: A graph to show bill length against bill depth in penguins, according to species")+
+  geom_smooth(method="lm")+
+  theme_classic()
+```
+
+Reference
+1. Ameringer, S., Serlin, R.C. and Ward, S. (2009). Simpson’s Paradox and Experimental Research. Nursing Research, [online] 58(2), pp.123–127. doi:https://doi.org/10.1097/nnr.0b013e318199b517.
+
+
+------------------------------------------------------------------------
+
+## QUESTION 2: Data Pipeline
+
+*Write a data analysis pipeline in your .rmd RMarkdown file. You should be aiming to write a clear explanation of the steps, the figures visible, as well as clear code.*
+
+*Your code should include the steps practiced in the lab session:*
+
+-   *Load the data*
+
+-   *Appropriately clean the data*
+
+-   *Create an Exploratory Figure (**not a boxplot**)*
+
+-   *Save the figure*
+
+-   ***New**: Run a statistical test*
+
+-   ***New**: Create a Results Figure*
+
+-   *Save the figure*
+
+*An exploratory figure shows raw data, such as the distribution of the data. A results figure demonstrates the stats method chosen, and includes the results of the stats test.*
+
+*Between your code, communicate clearly what you are doing and why.*
+
+*Your text should include:*
+
+-   *Introduction*
+
+-   *Hypothesis*
+
+-   *Stats Method*
+
+-   *Results*
+
+-   *Discussion*
+
+-   *Conclusion*
+
+*You will be marked on the following:*
+
+### a) Your code for readability and functionality
+
+### b) Your figures for communication
+
+### c) Your text communication of your analysis
+
+*Below is a template you can use.*
+
+------------------------------------------------------------------------
+
+### Introduction
+
+
+Introduction: In this project, I will be analysing the data in the 'palmerpenguins' dataset. I will run a statistical analysis on the data, and code figures to help explain this. The point of this exercise is to learn data reproducibility skills, so that any experiment I might undertake in the future will hopefully be reproducible to any viewers. First, I will clean the data, before carrying out an investigation on the data using a statistics analysis, and will finally draw my conclusions. I will run through my code in detail part by part first for ease of explanation, and finish by condensing it into a single pipeline.
+
+  
+This section uses skills learnt in the computer class. Before I start my analysis on the code, I want to clean up the data a little bit by removing a couple of columns I won't use and changing the names to be more computer readable. 
+
+```{r Data Exploration, message=FALSE, warning=FALSE}
+attach(penguins_raw) #This line makes the penguins_raw data accessible by name 
+
+names(penguins_raw)
+
+write.csv(penguins_raw, "data/penguins_raw.csv") #This line writes the penguins_raw data into a csv file to keep as an original copy, and stores it in the 'data' folder. For this line to work, the user must have a folder name "data" in their working directory. I have included this folder in the GitHub repo
+
+
+source("functions/cleaning.r")
+filtered_penguins <- clean_up_penguins(penguins_raw)
+#This line cleans up the column names, using a function I coded and saved into the cleaning.r file in the 'functions' folder. For this line to work, the user must have a folder name "functions" in their working directory. I have included this folder in the GitHub repo. A slightly more detailed explanation of the function can be found in the cleaning.r file
+
+
+
+names(filtered_penguins)
+```
+
+
+
+### Hypothesis
+I hypothesise that flipper length increases as body mass does in Adelie penguins. This is my alternative hypothesis, and my null hypothesis is that flipper length and body mass have no correlation in Adelie penguins.
+
+I am focussing on Adelies because I intend to run a linear regression model, which requires data to be normally distributed. The flipper length across all penguins is bimodal:
+
+```{r flipper hist, message=FALSE, warning=FALSE}
+flipper_hist <- filtered_penguins %>% 
+  ggplot(aes(x=flipper_length_mm))+
+  geom_histogram(bins=12)+
+  labs(x="Flipper length (mm)", y="Frequency", title="Flipper length histogram") +
+  theme_classic()
+#This brief pipeline codes a histogram of the flipper lengths within the filtered_penguins dataset using the ggplot2 package. 
+#The aes() function assigns variables to the axis, the geom_point() function plots the points, and the labs() function assigns labels to the axis and a title. The theme_classic() function just assigns a theme to the graph for aesthetic purposes.
+#The use of a pipeline isn't necessary, but could make it easier to add extra edits to the flipper length variable in future if needed.
+
+
+
+flipper_hist
+#The lines coding the graph save the graph as an item called "flipper_hist", so it must be called in order for the graph to be seen.
+```
+
+So I will have to filter my data for Adelies before I can start analysis. 
+
+```{r filter adelies}
+filtered_adelies <- filtered_penguins %>%
+  na.omit() %>%
+  filter(species=="Adelie Penguin (Pygoscelis adeliae)")
+#This pipeline removes the NAs from the dataset, which can cause errors/warnings when coding graphs, and it removes all species but the Adelies from the dataset.
+
+  
+head(filtered_adelies)
+```
+
+Now, we can see that the flipper length for just the Adelies is quite nicely normally distributed:
+
+```{r adelie flipper hist}
+adelie_flipper_hist <- filtered_adelies %>% 
+  ggplot(aes(x=flipper_length_mm))+
+  geom_histogram(bins=12)+
+  labs(x="Adelie flipper length (mm)", y="Frequency", title="Flipper length histogram for Adelies") +
+  theme_classic()
+#This line is very similar to the previous histogram code, but I have changed which dataset is used and the title.
+
+adelie_flipper_hist
+```
+
+
+Now I can start my investigation. This is a graph of the raw data:
+
+```{r raw data graph, message=FALSE}
+raw_data_graph <- filtered_adelies %>% 
+  ggplot(aes(x=body_mass_g, y=flipper_length_mm))+
+  geom_point()+
+  labs(x="Body mass (g)", y="Flipper length(mm)", title="Flipper length against body mass in Adelie penguins")+
+  theme_classic()
+#This piece of code creates the graph below. From the graph, in my first impression I expect to reject the null hypothesis, but I will run a statistics test to confirm this.
+
+
+raw_data_graph
+```
+
+
+### Statistical Methods
+My chosen statistical test is a linear regression model. The whole aim of a linear regression model is to evaluate correlation by drawing a line of best fit through the data, and analysing how far the points in the dataset deviate from this line - the better the points fit the line, the better one variable predicts the other. I chose linear regression because I am testing the correlation between two numerical variables, and I want to test essentially how well the value of one variable predicts the value of the other. From the graph of the raw data, the relationship between the variables appears to be nicely linear, and so a linear regression model is appropriate for this.
+
+```{r Statistics, message=FALSE}
+adelies_lm <- lm(flipper_length_mm~body_mass_g, data=filtered_adelies)#This line creates the linear regression model and stores it as 'adelies_lm'
+adelies_lm
+
+```
+
+Calling the model outputs the coefficients. What this tells us is the properties of the line of best fit - intercept refers to where the line crosses the y (flipper length) axis, meaning when body mass is set to 0, the flipper length of the penguin would be predicted to be 165.6mm. The body_mass_g coefficient refers to how much the value on the y axis (the flipper length) increases with each increment of 1 on the x axis (the body mass) - thus, this coefficient is the gradient. In this case, the gradient is 0.00661. Neither of these values particularly help us analyse the correlation right now, so we need a summary of the model.
+
+
+### Results & Discussion
+
+```{r linear model analysis}
+adelies_lm_summary <- adelies_lm %>%
+  summary()
+
+adelies_lm_summary
+#This line produces the analysis of the model. 
+```
+
+For much of this analysis to be understood, we have to view the regression line itself, fitted by the model.
+
+```{r linear model plot, message=FALSE}
+adelies_plot <- ggplot(data=filtered_adelies,aes(x=flipper_length_mm, y=body_mass_g))+
+  geom_point()+
+  labs(x="Flipper length(mm)", y="Body mass (g)", title="Flipper length against body mass") + geom_smooth(method="lm")+
+  theme_classic()
+#This piece of code creates the graph that I showed earlier, except I have added a line of best fit using the geom_smooth() function. The 'method' parameter tells R which kind of model to fit - in this case, "lm", or linear model.
+
+adelies_plot
+
+```
+
+
+This is the original graph of raw data, but I have added a line to show the linear regression model using the geom_smooth() function. The grey area around the line indicates the 95% confidence interval.
+
+Now it's time to start interpreting the summary of the model. To begin with, 'residuals' refers to the difference between the values predicted by the linear regression model, and the actual values found in the dataset. Ideally, the residuals will be symmetrically surrounded around 0, which would mean that there aren't noticeable deviations from the predicted trend in a certain direction (but it doesn't account for symmetrical deviations from the model). This is very roughly the case - the median is 1, the quartiles are quite evenly spread, but the minimum and maximum values are a bit different, so we need more evidence to evaluate the hypothesis. 
+
+The next section is the coefficients section. The estimates are just what I explained when I called the model previously. The standard error is how the values obtained are expected to differ from the real values - essentially, it is a measure of accuracy of the measurements. This is very low for both, so we know the measurements are reliable. The t values and P values (written in the summary as 'Pr(>|t|)') are the values obtained from statistically testing whether the coefficients significantly differ from 0. We can ignore the intercept's results for this, as the intercept isn't relevant to my investigation. However, by examining the gradient results, this tells us whether the gradient of the line fitted significantly differs from 0. A gradient of 0 indicates that the line of best fit is a straight horizontal line, and thus, no trend in the data. Though our gradient is 0.0061 which seems incredibly low, the P value is 3.4e-09, which indicates a gradient highly significant from 0. This can be seen on the graph as the gradient is clearly not 0 and makes more sense when interpreted in the context of the graph - the scales on the axes differ highly, and there is a lot more variation in body weight than in flipper length. Thus, even though our coefficient tells us the flipper length only increases a tiny amount with each gram increment of the body mass, this still overall produces a noticeable gradient. This is our first piece of evidence that there is a significant positive trend present between flipper length and body mass in Adelie penguins, but we still need to assess how well the model fits the graph.
+
+After this comes the R squared section, and the most important part of this is the adjusted R squared value. This number tells us how much variance in the dependent variable (the flipper mass) can be explained by the variation in the independent variable (body mass). The value for this is 0.2106, which means that 21.06% of the variation in flipper length of penguins can be explained by their body mass. This is quite a low value, indicating that only a little bit of variation in flipper mass is caused by the body mass, which implies the model is not a good fit. However, the P value is very low, indicating significance at the 0.05 significance level. This implies that the model is indeed a good fit for the data. Although it seems odd that a model that has such low ability to predict values could still be a significantly good fit, this can once again be understood in context of the model. The line appears to fit the general trend of the data quite well, which is the cause of the significant P value. However, the points are widely spread out around the line, and it would be extremely difficult to predict the flipper length given a certain body mass, so this causes the low R squared value. Despite this, the model gives a better idea of the range of flipper lengths found at different body masses than if there were no model at all, so it is still an appropriate model.
+
+
+
+
+### Conclusion
+From my linear regression test and the figures that I have provided, I have decided to reject the null hypothesis (that body mass of the penguin has no effect on flipper length in Adelies) and concluded that the flipper length of an Adelie penguin increases as body mass does. Despite the significance, one issue with the model is that I doubt it would be useful for predicting flipper length given a body mass. It only really serves to show that there is a significant correlation between flipper length and body mass in Adelies. There are multiple ways to expand upon this in future studies, such as investigating how this trend may vary within other species or perhaps as a penguin ages, along with repeating this study while swapping out variables such as using penguin height rather than body mass. I accept that there are some flaws with my statistical method, for example I haven't run any numerical tests to determine whether the data truly fits the assumptions for a linear regression model, but I have tried to mediate this through use of a subjective test of normality. In terms of code functionability and readability, I think my code functions sufficiently well and have tried to make my code readable. By uploading my code to GitHub, I hope to make this analysis reproducible enough to be replicated in future if ever necessary.
+
+
+
+As a final note, I have condensed all of the code I used for producing my final graph into a single pipe. In this project I wanted to describe my code and process in detail, but if I were to code this during real analysis to be reproducible by other scientists with experience of R, I would create this pipe and explain it in a paragraph afterwards. 
+
+
+```{r full data pipe, message=FALSE}
+adelies_full_analysis <- penguins_raw %>%
+  select(-starts_with("Delta")) %>%
+  select(-Comments) %>%
+  clean_names() %>%
+  na.omit() %>%
+  filter(species=="Adelie Penguin (Pygoscelis adeliae)") %>%
+  ggplot(aes(x=flipper_length_mm, y=body_mass_g))+
+  geom_point()+
+  labs(x="Flipper length(mm)", y="Body mass (g)", title="Flipper length against body mass") + geom_smooth(method="lm")+
+  theme_classic()
+
+adelies_full_analysis
+```
+
+------------------------------------------------------------------------
+
+## QUESTION 3: Open Science
+
+### a) GitHub
+
+*Upload your RProject you created for **Question 2** and any files and subfolders used to GitHub. Do not include any identifiers such as your name. Make sure your GitHub repo is public.*
+
+*GitHub link:* https://github.com/penguinsprojectr/Reproducible-figures/tree/main
+
+*You will be marked on your repo organisation and readability.*
+
+### b) Share your repo with a partner, download, and try to run their data pipeline.
+
+*Partner's GitHub link:* https://github.com/pjfua/penguinproject/tree/main
+
+*You **must** provide this so I can verify there is no plagiarism between you and your partner.*
+
+### c) Reflect on your experience running their code. (300-500 words)
+
+-   *What elements of your partner's code helped you to understand their data pipeline?*
+
+-   *Did it run? Did you need to fix anything?*
+
+-   *What suggestions would you make for improving their code to make it more understandable or reproducible, and why?*
+
+-   *If you needed to alter your partner's figure using their code, do you think that would be easy or difficult, and why?*
+
+
+To begin with presentation, I thought my partner’s code was very easily understandable. They provided plenty of comments throughout, nicely spaced, and explained each point in simple terms. The graphs were functional, effective, and aesthetically pleasing. 
+Their code ran perfectly. Once I downloaded the necessary files from GitHub and loaded the necessary packages, each chunk ran exactly as it should, and the outcome was exactly as expected. I didn’t need to fix any areas at all, other than making sure I had compiled all of the download files in the same folder and set my working directory correctly – I do think that it would have helped to note the importance of downloading these extra files early in the code.
+One point for improvement I would make is (though I realise upon reflection of my own code I almost certainly overexplained some areas) that I thought some lines of code could have been explained in slightly more detail. I thought the attributes/parameters of some of the functions could be explained more – for example, I’m not sure what the ‘which’ attribute in the plot() function does. Similarly, I have never come across the dev.off() function before, and I’m not entirely sure what it does, so I think that could have done with being explained.
+I think that for the most part I would be able to edit my partner’s code effectively. They didn’t overcomplicate their code, and didn’t include unnecessary attributes in their figures. Other than the one or two lines of code I mentioned above, I think it would be very easy to alter my partner’s analysis to test similar hypotheses. 
+Overall, I was highly impressed with my partner’s code. I had very little to say in the way of criticism or improvement. It is transparent, understandable, runs effectively and, crucially, reproducible. I think they would have no issue submitting this code to a journal. 
+
+
+
+### d) Reflect on your own code based on your experience with your partner's code and their review of yours. (300-500 words)
+
+-   *What improvements did they suggest, and do you agree?*
+
+-   *What did you learn about writing code for other people?*
+
+
+My partner liked my code, and thought my presentation was clearly laid out. They thought my code was well explained, though some areas potentially required more spacing, or perhaps some headings to split up long paragraphs. I completely agree with this, and realised as I was reading their code that I have probably overexplained some areas, such as the results of the linear model summary. 
+They appreciated that I had noted in my README.md file in my repo that the data folder was required to run the write.csv() line of my code. Also, they did have a couple of issues with installing/loading packages at first, but they appreciated that I had laid the installations out neatly at the beginning, and this may have been down to an issue with their computer. 
+This previous point highlights one of the issues with work only being checked by one person – if an area of code isn’t working, it can be unclear whether this is an issue with the code or just a technical issue. This is why work must be reviewed by multiple peers before being accepted by a journal, and this process is crucial to ensuring reproducibility of code. 
+Reading through my partner’s code also made me aware of some improvements I could make to mine. I already noted that I think I overexplained some areas, but I also think that I definitely should have added more biological context to my hypothesis – specifically, describing how the results of my graph would apply in real life, and why it may be important to test this analysis. For example, testing the relationship between body mass and flipper length could be important if flipper morphology is specific to different species, and so the flipper length/body mass trend within each species could be useful for investigating the evolutionary history of penguin morphology. 
+I had a very positive experience of swapping code with my partner. However, this was definitely helped by the fact that both of our data pipelines worked well. I realise that more challenges arise when code is more complicated, and more criticisms must be raised, but I did enjoy the experience of going through a peer’s code and providing feedback, and I enjoyed troubleshooting my own code throughout the project. I think receiving feedback from others is crucial for both improving the code itself and ensuring reproducibility. 
+
