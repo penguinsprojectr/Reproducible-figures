@@ -295,7 +295,7 @@ adelies_full_analysis
 
 *Upload your RProject you created for **Question 2** and any files and subfolders used to GitHub. Do not include any identifiers such as your name. Make sure your GitHub repo is public.*
 
-*GitHub link:* https://github.com/1431293/Reproducible-figures/tree/main
+*GitHub link:* https://github.com/penguinsprojectr/Reproducible-figures/tree/main
 
 *You will be marked on your repo organisation and readability.*
 
